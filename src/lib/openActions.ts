@@ -159,8 +159,8 @@ export async function openInHerdr(projectPath: string, resolvedPath: string): Pr
 
 /**
  * Opens a new iTerm window/tab already `cd`'d into `projectPath`. iTerm
- * registers as a folder-open handler, so `open -a <iTerm path or name> <dir>`
- * opens a new session rooted at that directory without needing AppleScript.
+ * registers as a folder-open handler, so handing the directory to the app
+ * opens a new session rooted there without needing AppleScript.
  */
 export async function openInITerm(projectPath: string, resolvedPath: string): Promise<void> {
   const target: EditorTarget = "iterm";
@@ -169,7 +169,9 @@ export async function openInITerm(projectPath: string, resolvedPath: string): Pr
     await openWithCliBinary(resolvedPath, projectPath, target);
     return;
   }
-  await openWithAppBundle(resolvedPath, projectPath, target);
+  // Shares the editor dispatch so a bundle identifier goes through `open -b`;
+  // `open -a` only understands an app name or path and would fail on one.
+  await openWithEditor(projectPath, resolvedPath, target);
 }
 
 async function openWithEditor(projectPath: string, resolvedPath: string, target: EditorTarget): Promise<void> {

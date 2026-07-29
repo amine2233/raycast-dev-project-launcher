@@ -112,9 +112,9 @@
     {
       "name": "defaultITermPath",
       "type": "textfield",
-      "title": "Default iTerm App Path",
-      "description": "Fallback path to the iTerm.app bundle used when a project type has no specific mapping.",
-      "default": "/Applications/iTerm.app",
+      "title": "Default iTerm App",
+      "description": "Fallback iTerm used when a project type has no specific mapping. Accepts a bundle identifier (resolves the app wherever it is installed, including ~/Applications), an absolute .app path, or an app name.",
+      "default": "com.googlecode.iterm2",
       "required": false
     },
     {

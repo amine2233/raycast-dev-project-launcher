@@ -20,7 +20,7 @@ type ExtensionPreferences = {
   "defaultVSCodePath": string,
   /** Default WebStorm Command/Path - Fallback command or absolute path used to open projects in WebStorm when a project type has no specific mapping. */
   "defaultWebStormPath": string,
-  /** Default iTerm App Path - Fallback path to the iTerm.app bundle used when a project type has no specific mapping. */
+  /** Default iTerm App - Fallback iTerm used when a project type has no specific mapping. Accepts a bundle identifier (resolves the app wherever it is installed, including ~/Applications), an absolute .app path, or an app name. */
   "defaultITermPath": string,
   /** Default Herdr Command/Path - Command used to create a herdr workspace. Leave as "herdr" to resolve it on PATH, or set an absolute path if your Homebrew prefix isn't a standard one. */
   "defaultHerdrPath": string

@@ -13,7 +13,13 @@ import type { CustomTypeRule } from "./projectTypeDetector";
  */
 const STORAGE_KEY = "dev-project-launcher.app-path-store.v1";
 
-const ITERM = "/Applications/iTerm.app";
+/**
+ * Bundle identifiers rather than absolute paths: Launch Services resolves these
+ * wherever the app actually lives, so an install under `~/Applications`, Setapp,
+ * or a versioned bundle works without the user editing any mapping.
+ */
+const ITERM = "com.googlecode.iterm2";
+const ANDROID_STUDIO = "com.google.android.studio";
 const HERDR = "herdr";
 /**
  * Apple's own `/usr/bin/xed`, which opens the .xcodeproj/.xcworkspace/Package.swift
@@ -32,7 +38,7 @@ export const DEFAULT_APP_PATH_STORE: AppPathStore = {
   xcode: { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
   "swift-package": { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
   "android-gradle": {
-    preferred: "/Applications/Android Studio.app",
+    preferred: ANDROID_STUDIO,
     vscode: "code",
     webstorm: "studio",
     iterm: ITERM,
@@ -50,6 +56,42 @@ export const DEFAULT_APP_PATH_STORE: AppPathStore = {
   generic: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
 };
 
+/**
+ * Absolute paths this extension used to ship, mapped to the bundle identifier
+ * that replaced them. A stored value equal to one of these was never chosen by
+ * the user — it was seeded — so it can be upgraded safely.
+ */
+const RETIRED_DEFAULTS: Record<string, string> = {
+  "/Applications/iTerm.app": ITERM,
+  "/Applications/Android Studio.app": ANDROID_STUDIO,
+};
+
+/**
+ * Merges the persisted store over the shipped defaults, per type rather than
+ * per store, so mappings saved by an older version keep the user's edits while
+ * gaining fields added since (e.g. `preferred`, `herdr`).
+ *
+ * Stored values that are still verbatim a retired default get upgraded to the
+ * bundle identifier — without this, `{ ...defaults, ...saved }` would let the
+ * old `/Applications/...` path win and nobody with an existing install would
+ * ever see the fix. Anything the user actually typed is left alone.
+ */
+export function mergeWithDefaults(parsed: AppPathStore): AppPathStore {
+  const merged: AppPathStore = {};
+
+  for (const [type, mapping] of Object.entries({ ...DEFAULT_APP_PATH_STORE, ...parsed })) {
+    const saved = parsed[type] ?? {};
+    const upgraded = Object.fromEntries(
+      Object.entries(saved).map(([field, value]) =>
+        typeof value === "string" && RETIRED_DEFAULTS[value] ? [field, RETIRED_DEFAULTS[value]] : [field, value],
+      ),
+    );
+    merged[type] = { ...DEFAULT_APP_PATH_STORE[type], ...mapping, ...upgraded };
+  }
+
+  return merged;
+}
+
 /** Loads the full persisted store, seeding it with defaults on first run. */
 export async function loadAppPathStore(): Promise<AppPathStore> {
   const raw = await LocalStorage.getItem<string>(STORAGE_KEY);
@@ -58,14 +100,7 @@ export async function loadAppPathStore(): Promise<AppPathStore> {
     return { ...DEFAULT_APP_PATH_STORE };
   }
   try {
-    const parsed = JSON.parse(raw) as AppPathStore;
-    // Merge per type, not per store, so a mapping saved by an older version
-    // keeps the user's edits while gaining fields added since (e.g. `preferred`).
-    const merged: AppPathStore = { ...parsed };
-    for (const [type, defaults] of Object.entries(DEFAULT_APP_PATH_STORE)) {
-      merged[type] = { ...defaults, ...parsed[type] };
-    }
-    return merged;
+    return mergeWithDefaults(JSON.parse(raw) as AppPathStore);
   } catch {
     return { ...DEFAULT_APP_PATH_STORE };
   }
@@ -147,9 +182,24 @@ const CLI_DISPLAY_NAMES: Record<string, string> = {
   rubymine: "RubyMine",
 };
 
+/**
+ * Display names for bundle identifiers. Without these the generic fallback
+ * below takes the last dot-segment, which reads as "studio" or "iterm2".
+ */
+const BUNDLE_DISPLAY_NAMES: Record<string, string> = {
+  "com.google.android.studio": "Android Studio",
+  "com.googlecode.iterm2": "iTerm",
+  "com.apple.dt.Xcode": "Xcode",
+  "com.jetbrains.intellij": "IntelliJ IDEA",
+  "com.microsoft.VSCode": "VS Code",
+};
+
 /** Turns an app path, bundle id, or command into a label: "xed" -> "Xcode". */
 export function appDisplayName(resolvedPath: string): string {
-  const base = resolvedPath.trim().replace(/\/+$/, "").split("/").pop() ?? resolvedPath;
+  const trimmed = resolvedPath.trim();
+  if (BUNDLE_DISPLAY_NAMES[trimmed]) return BUNDLE_DISPLAY_NAMES[trimmed];
+
+  const base = trimmed.replace(/\/+$/, "").split("/").pop() ?? trimmed;
   if (base.toLowerCase().endsWith(".app")) return base.slice(0, -".app".length);
   if (CLI_DISPLAY_NAMES[base]) return CLI_DISPLAY_NAMES[base];
   if (base.split(".").length > 2) return base.split(".").pop() ?? base;

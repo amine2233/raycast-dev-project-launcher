@@ -116,7 +116,7 @@ export default function Command() {
       case "webstorm":
         return prefs.defaultWebStormPath ?? "webstorm";
       case "iterm":
-        return prefs.defaultITermPath ?? "/Applications/iTerm.app";
+        return prefs.defaultITermPath ?? "com.googlecode.iterm2";
       case "herdr":
         return prefs.defaultHerdrPath ?? "herdr";
     }

@@ -237,10 +237,10 @@ function AppPathForm({ existingType, existingMapping, onSaved }: AppPathFormProp
       />
       <Form.TextField
         id="iterm"
-        title="iTerm Path"
-        placeholder="/Applications/iTerm.app"
-        defaultValue={existingMapping?.iterm ?? "/Applications/iTerm.app"}
-        info="Absolute path to the iTerm.app bundle (or its display name)."
+        title="iTerm"
+        placeholder="com.googlecode.iterm2"
+        defaultValue={existingMapping?.iterm ?? "com.googlecode.iterm2"}
+        info="A bundle identifier resolves the app wherever it is installed, including ~/Applications. An absolute .app path or an app display name also work."
       />
       <Form.TextField
         id="herdr"

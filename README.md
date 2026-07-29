@@ -74,7 +74,7 @@ Configured from Raycast → Extensions → Dev Project Launcher → Preferences:
 | Exclude Folder Names | text | `node_modules,.git,DerivedData,build,dist,.build,Pods,.gradle,.idea,.vscode` | Extra folder names to skip while walking. Folders starting with `.` or `_` are always skipped. |
 | Default VS Code Command/Path | text | `code` | Fallback used when a project type has no specific mapping. |
 | Default WebStorm Command/Path | text | `webstorm` | Fallback for WebStorm/JetBrains IDEs. |
-| Default iTerm App Path | text | `/Applications/iTerm.app` | Fallback iTerm app path. |
+| Default iTerm App | text | `com.googlecode.iterm2` | Fallback iTerm. A bundle identifier resolves the app wherever it is installed; an absolute `.app` path or app name also work. |
 | Default Herdr Command/Path | text | `herdr` | Command used to create a [herdr](https://herdr.dev) workspace. Resolved via `PATH`; set an absolute path if your Homebrew prefix isn't a standard one. |
 
 ## Dynamic per-project-type app paths
@@ -105,8 +105,16 @@ Each path field accepts either:
 - an absolute path to a `.app` bundle (or its Spotlight-resolvable display
   name, e.g. `Visual Studio Code`), or
 - a bundle identifier such as `com.apple.dt.Xcode`, which Launch Services
-  resolves wherever the app lives — useful for side-by-side installs like
-  `/Applications/Xcode-26.6.0.app` that an absolute path would miss.
+  resolves wherever the app lives.
+
+Bundle identifiers are what the shipped defaults use, because absolute paths
+break whenever an app isn't in `/Applications` — a user-local install under
+`~/Applications`, a Setapp copy, or a side-by-side bundle like
+`/Applications/Xcode-26.6.0.app`. Find one with:
+
+```bash
+mdls -name kMDItemCFBundleIdentifier -raw ~/Applications/iTerm.app
+```
 
 The extension host augments `PATH` with the common install locations for VS
 Code's shell command and JetBrains Toolbox scripts before invoking bare
