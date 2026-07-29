@@ -40,6 +40,7 @@ mapping per project type.
 raycast-dev-project-launcher/
 ├── mise.toml                    # Task runner (wraps the npm scripts)
 ├── package.json                 # Raycast extension manifest + preferences
+├── metadata/                    # Store screenshots (2000x1250)
 ├── tsconfig.json
 ├── raycast-env.d.ts              # Typed preference/argument declarations
 ├── .eslintrc.json / .prettierrc
@@ -63,7 +64,7 @@ Configured from Raycast → Extensions → Dev Project Launcher → Preferences:
 
 | Preference | Type | Default | Description |
 | --- | --- | --- | --- |
-| Development Root Directory | directory | `~/Developer` | Root folder scanned recursively. Leave it empty and the extension auto-detects the first existing of `~/Developer`, `~/Development`, `~/Projects`, `~/Code`, `~/dev`. |
+| Development Root Directory | directory | *(empty)* | Root folder scanned recursively. Left empty — the default — the extension scans whichever of `~/Developer`, `~/Development`, `~/Projects`, `~/Code`, `~/dev` exist. |
 | Additional Project Directories | text | *(empty)* | Comma-separated extra absolute paths, e.g. `~/Work,~/OpenSource`. |
 | Scan Depth | dropdown | `2` | How many levels deep to search below each root (1–6, 8, 10). |
 | Exclude Folder Names | text | `node_modules,.git,DerivedData,build,dist,.build,Pods,.gradle,.idea,.vscode` | Extra folder names to skip while walking. Folders starting with `.` or `_` are always skipped. |
@@ -83,7 +84,11 @@ project type. Open the **Manage App Paths** command to:
 - Edit the **Preferred App** (what `Enter` uses) plus the VS Code / WebStorm /
   iTerm path for any existing type.
 - Register a completely new project type (e.g. `unity3d`) with its own
-  mapping — no source changes or extension re-install needed.
+  **marker files** and mapping — no source changes or extension re-install
+  needed. A custom type is matched before the builtin rules, so declaring
+  `deno.json` for a `deno` type wins over the `package.json` that would
+  otherwise make the folder a Node project. A custom type registered without
+  markers can never match a folder, so the field is required in practice.
 - Remove custom types you no longer need (builtin types simply revert to
   their shipped defaults).
 

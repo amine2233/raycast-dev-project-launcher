@@ -33,7 +33,6 @@
       "type": "directory",
       "title": "Development Root Directory",
       "description": "The root folder that will be scanned recursively for projects. Leave empty to auto-detect ~/Developer, ~/Development, ~/Projects, ~/Code or ~/dev.",
-      "default": "~/Developer",
       "required": false
     },
     {

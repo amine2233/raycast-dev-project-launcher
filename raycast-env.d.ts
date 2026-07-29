@@ -9,7 +9,7 @@
 
 type ExtensionPreferences = {
   /** Development Root Directory - The root folder that will be scanned recursively for projects. Leave empty to auto-detect ~/Developer, ~/Development, ~/Projects, ~/Code or ~/dev. */
-  "developmentPath": string,
+  "developmentPath"?: string,
   /** Additional Project Directories - Comma-separated list of extra absolute paths to scan alongside the root directory (e.g. ~/Work,~/OpenSource). */
   "customProjectDirectories"?: string,
   /** Scan Depth - How many directory levels deep to search for projects below each root. */
