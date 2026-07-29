@@ -24,6 +24,10 @@ function buildAugmentedEnv(): NodeJS.ProcessEnv {
     "/sbin",
     path.join(home, "Library/Application Support/JetBrains/Toolbox/scripts"),
     path.join(home, ".local/bin"),
+    // User-local Homebrew prefixes, where tools like herdr end up when brew
+    // isn't installed system-wide.
+    path.join(home, ".local/Homebrew/bin"),
+    path.join(home, "homebrew/bin"),
   ];
   const currentPath = process.env.PATH ?? "";
   const merged = Array.from(new Set([...currentPath.split(":").filter(Boolean), ...extraPaths])).join(":");
@@ -122,6 +126,35 @@ export async function openInPreferredApp(projectPath: string, resolvedPath: stri
 /** Opens a project folder in WebStorm (or any JetBrains IDE command configured for the type). */
 export async function openInWebStorm(projectPath: string, resolvedPath: string): Promise<void> {
   await openWithEditor(projectPath, resolvedPath, "webstorm");
+}
+
+/**
+ * Creates a focused herdr workspace rooted at the project. Unlike the editors,
+ * herdr is driven by subcommands over its socket API rather than by handing a
+ * path to a launcher, so it can't go through openWithEditor.
+ */
+export async function openInHerdr(projectPath: string, resolvedPath: string): Promise<void> {
+  const target: EditorTarget = "herdr";
+  const args = ["workspace", "create", "--cwd", projectPath, "--label", path.basename(projectPath), "--focus"];
+
+  try {
+    await execFileAsync(resolvedPath, args, { env: buildAugmentedEnv() });
+  } catch (error) {
+    const err = error as NodeJS.ErrnoException;
+    if (err.code === "ENOENT") {
+      throw new OpenActionError(
+        `Command "${resolvedPath}" was not found on PATH. Set an absolute path to the herdr binary in Manage App Paths.`,
+        target,
+        `${resolvedPath} ${args.join(" ")}`,
+      );
+    }
+    // The CLI talks to a running herdr server; without one it exits non-zero.
+    throw new OpenActionError(
+      `herdr couldn't create the workspace: ${err.message}. Check that the herdr server is running with "herdr status".`,
+      target,
+      `${resolvedPath} ${args.join(" ")}`,
+    );
+  }
 }
 
 /**

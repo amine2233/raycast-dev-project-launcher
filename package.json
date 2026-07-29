@@ -116,6 +116,14 @@
       "description": "Fallback path to the iTerm.app bundle used when a project type has no specific mapping.",
       "default": "/Applications/iTerm.app",
       "required": false
+    },
+    {
+      "name": "defaultHerdrPath",
+      "type": "textfield",
+      "title": "Default Herdr Command/Path",
+      "description": "Command used to create a herdr workspace. Leave as \"herdr\" to resolve it on PATH, or set an absolute path if your Homebrew prefix isn't a standard one.",
+      "default": "herdr",
+      "required": false
     }
   ],
   "dependencies": {

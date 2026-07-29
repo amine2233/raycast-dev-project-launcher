@@ -62,9 +62,10 @@ export interface AppPathMapping {
   vscode?: string;
   webstorm?: string;
   iterm?: string;
+  herdr?: string;
 }
 
 /** The full persisted preferences document, keyed by ProjectType. */
 export type AppPathStore = Record<string, AppPathMapping>;
 
-export type EditorTarget = "preferred" | "vscode" | "webstorm" | "iterm";
+export type EditorTarget = "preferred" | "vscode" | "webstorm" | "iterm" | "herdr";

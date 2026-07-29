@@ -14,6 +14,7 @@ import type { CustomTypeRule } from "./projectTypeDetector";
 const STORAGE_KEY = "dev-project-launcher.app-path-store.v1";
 
 const ITERM = "/Applications/iTerm.app";
+const HERDR = "herdr";
 /**
  * Apple's own `/usr/bin/xed`, which opens the .xcodeproj/.xcworkspace/Package.swift
  * inside a folder with whichever Xcode is currently selected — no hardcoded app
@@ -28,24 +29,25 @@ const XCODE = "xed";
  * rather than in VS Code. Types with no single obvious tool default to VS Code.
  */
 export const DEFAULT_APP_PATH_STORE: AppPathStore = {
-  xcode: { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM },
-  "swift-package": { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM },
+  xcode: { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
+  "swift-package": { preferred: XCODE, vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
   "android-gradle": {
     preferred: "/Applications/Android Studio.app",
     vscode: "code",
     webstorm: "studio",
     iterm: ITERM,
+    herdr: HERDR,
   },
-  "kotlin-gradle": { preferred: "idea", vscode: "code", webstorm: "webstorm", iterm: ITERM },
-  node: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM },
-  typescript: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM },
-  python: { preferred: "code", vscode: "code", webstorm: "pycharm", iterm: ITERM },
-  rust: { preferred: "code", vscode: "code", webstorm: "clion", iterm: ITERM },
-  go: { preferred: "code", vscode: "code", webstorm: "goland", iterm: ITERM },
-  "java-maven": { preferred: "idea", vscode: "code", webstorm: "idea", iterm: ITERM },
-  flutter: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM },
-  ruby: { preferred: "code", vscode: "code", webstorm: "rubymine", iterm: ITERM },
-  generic: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM },
+  "kotlin-gradle": { preferred: "idea", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
+  node: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
+  typescript: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
+  python: { preferred: "code", vscode: "code", webstorm: "pycharm", iterm: ITERM, herdr: HERDR },
+  rust: { preferred: "code", vscode: "code", webstorm: "clion", iterm: ITERM, herdr: HERDR },
+  go: { preferred: "code", vscode: "code", webstorm: "goland", iterm: ITERM, herdr: HERDR },
+  "java-maven": { preferred: "idea", vscode: "code", webstorm: "idea", iterm: ITERM, herdr: HERDR },
+  flutter: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
+  ruby: { preferred: "code", vscode: "code", webstorm: "rubymine", iterm: ITERM, herdr: HERDR },
+  generic: { preferred: "code", vscode: "code", webstorm: "webstorm", iterm: ITERM, herdr: HERDR },
 };
 
 /** Loads the full persisted store, seeding it with defaults on first run. */
@@ -116,6 +118,8 @@ export function resolveAppPath(
       return "webstorm";
     case "iterm":
       return ITERM;
+    case "herdr":
+      return HERDR;
   }
 }
 

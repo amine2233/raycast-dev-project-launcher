@@ -20,6 +20,7 @@ import { detectDefaultRoots, expandHome, parseCommaSeparated, scanForProjects } 
 import { appDisplayName, customTypeRules, loadAppPathStore, resolveAppPath } from "./lib/appPathStore";
 import { iconForProjectType } from "./lib/projectIcons";
 import {
+  openInHerdr,
   openInITerm,
   openInPreferredApp,
   openInVSCode,
@@ -116,6 +117,8 @@ export default function Command() {
         return prefs.defaultWebStormPath ?? "webstorm";
       case "iterm":
         return prefs.defaultITermPath ?? "/Applications/iTerm.app";
+      case "herdr":
+        return prefs.defaultHerdrPath ?? "herdr";
     }
   }
 
@@ -135,6 +138,7 @@ export default function Command() {
       if (target === "preferred") await openInPreferredApp(project.path, resolvedPath);
       else if (target === "vscode") await openInVSCode(project.path, resolvedPath);
       else if (target === "webstorm") await openInWebStorm(project.path, resolvedPath);
+      else if (target === "herdr") await openInHerdr(project.path, resolvedPath);
       else await openInITerm(project.path, resolvedPath);
 
       toast.style = Toast.Style.Success;
@@ -162,6 +166,8 @@ export default function Command() {
         return "WebStorm";
       case "iterm":
         return "iTerm";
+      case "herdr":
+        return "Herdr";
     }
   }
 
@@ -228,6 +234,12 @@ export default function Command() {
                         icon={Icon.Terminal}
                         shortcut={{ modifiers: ["cmd"], key: "t" }}
                         onAction={() => handleOpen(project, "iterm")}
+                      />
+                      <Action
+                        title="Open as Herdr Workspace"
+                        icon={Icon.AppWindowGrid2x2}
+                        shortcut={{ modifiers: ["cmd"], key: "h" }}
+                        onAction={() => handleOpen(project, "herdr")}
                       />
                     </ActionPanel.Section>
                     <ActionPanel.Section title="Manage">

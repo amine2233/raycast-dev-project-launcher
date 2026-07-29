@@ -114,6 +114,7 @@ function summarize(mapping: AppPathMapping): string {
   if (mapping.vscode) parts.push(`VS Code: ${mapping.vscode}`);
   if (mapping.webstorm) parts.push(`WebStorm: ${mapping.webstorm}`);
   if (mapping.iterm) parts.push(`iTerm: ${mapping.iterm}`);
+  if (mapping.herdr) parts.push(`Herdr: ${mapping.herdr}`);
   return parts.length > 0 ? parts.join("  ·  ") : "No paths configured yet";
 }
 
@@ -136,6 +137,7 @@ function AppPathForm({ existingType, existingMapping, onSaved }: AppPathFormProp
     vscode: string;
     webstorm: string;
     iterm: string;
+    herdr: string;
   }) {
     const typeName = values.typeName.trim();
     if (!typeName) {
@@ -156,6 +158,7 @@ function AppPathForm({ existingType, existingMapping, onSaved }: AppPathFormProp
       vscode: values.vscode.trim() || undefined,
       webstorm: values.webstorm.trim() || undefined,
       iterm: values.iterm.trim() || undefined,
+      herdr: values.herdr.trim() || undefined,
     };
 
     const normalizedType = typeName.toLowerCase();
@@ -238,6 +241,13 @@ function AppPathForm({ existingType, existingMapping, onSaved }: AppPathFormProp
         placeholder="/Applications/iTerm.app"
         defaultValue={existingMapping?.iterm ?? "/Applications/iTerm.app"}
         info="Absolute path to the iTerm.app bundle (or its display name)."
+      />
+      <Form.TextField
+        id="herdr"
+        title="Herdr Command"
+        placeholder="herdr"
+        defaultValue={existingMapping?.herdr ?? "herdr"}
+        info="Command used to run `herdr workspace create` for this project type. A bare command is resolved via PATH; use an absolute path if yours lives outside a standard Homebrew prefix."
       />
     </Form>
   );

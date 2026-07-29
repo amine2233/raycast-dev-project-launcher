@@ -25,6 +25,10 @@ mapping per project type.
 - **Multi-action panel** on every project: Open in the preferred app, Open in
   VS Code (`Cmd+E`), WebStorm (`Cmd+W`), iTerm (`Cmd+T`), Reveal in Finder,
   Copy Path, Open With…, Rescan.
+- **Open as a [herdr](https://herdr.dev) workspace** (`Cmd+H`) — runs
+  `herdr workspace create --cwd <project> --label <name> --focus`, so the
+  selected project becomes a focused terminal workspace rather than just an
+  editor window. Requires a running herdr server (`herdr status`).
 - **Custom user-defined project directories** — add as many extra scan roots
   as you like from extension preferences, no code changes required.
 - **Persistent, dynamic app-path mapping** — a second command, *Manage App
@@ -71,6 +75,7 @@ Configured from Raycast → Extensions → Dev Project Launcher → Preferences:
 | Default VS Code Command/Path | text | `code` | Fallback used when a project type has no specific mapping. |
 | Default WebStorm Command/Path | text | `webstorm` | Fallback for WebStorm/JetBrains IDEs. |
 | Default iTerm App Path | text | `/Applications/iTerm.app` | Fallback iTerm app path. |
+| Default Herdr Command/Path | text | `herdr` | Command used to create a [herdr](https://herdr.dev) workspace. Resolved via `PATH`; set an absolute path if your Homebrew prefix isn't a standard one. |
 
 ## Dynamic per-project-type app paths
 
@@ -82,7 +87,7 @@ extension keeps a **separate, user-editable store in `LocalStorage`**
 project type. Open the **Manage App Paths** command to:
 
 - Edit the **Preferred App** (what `Enter` uses) plus the VS Code / WebStorm /
-  iTerm path for any existing type.
+  iTerm / Herdr path for any existing type.
 - Register a completely new project type (e.g. `unity3d`) with its own
   **marker files** and mapping — no source changes or extension re-install
   needed. A custom type is matched before the builtin rules, so declaring
