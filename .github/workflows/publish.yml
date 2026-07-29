@@ -1,14 +1,8 @@
 name: Publish to Raycast Store
 
+# Run by hand from the Actions tab, independently of Release. Publishing opens
+# or updates a pull request against raycast/extensions for human review.
 on:
-  # Called by the Release workflow once a new version has actually been cut,
-  # and available on its own from the Actions tab to re-submit by hand.
-  workflow_call:
-    secrets:
-      RAY_TOKEN:
-        required: true
-      RAYCAST_GITHUB_TOKEN:
-        required: true
   workflow_dispatch:
 
 env:
@@ -19,10 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Pick up the release commit the Release job just pushed, not the
-          # caller's pre-release SHA.
-          ref: main
 
       - uses: jdx/mise-action@v2
 

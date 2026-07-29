@@ -1,8 +1,9 @@
 name: Release
 
+# Run by hand from the Actions tab. Publishing to the Store is a separate,
+# independently triggered workflow.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,8 +16,6 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
-    outputs:
-      released: ${{ steps.release.outputs.released }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,24 +27,6 @@ jobs:
       - uses: jdx/mise-action@v2
 
       - name: Release
-        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -eu
-          before=$(node -p "require('./package.json').version")
-          mise run release
-          after=$(node -p "require('./package.json').version")
-          # Most pushes (docs:, chore:, refactor:) produce no release at all.
-          if [ "$before" = "$after" ]; then
-            echo "released=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "released=true" >> "$GITHUB_OUTPUT"
-            echo "Released $after"
-          fi
-
-  publish:
-    needs: release
-    if: needs.release.outputs.released == 'true'
-    uses: ./.github/workflows/publish.yml
-    secrets: inherit
+        run: mise run release

@@ -183,21 +183,20 @@ from the conventional commit messages, so nothing is bumped by hand:
 | any `BREAKING CHANGE:` footer | major |
 | `chore:`, `docs:`, `refactor:`, `test:`, `ci:` | none |
 
-**[`.github/workflows/release.yml`](.github/workflows/release.yml)** runs on
-every push to `main`: it runs `check`, works out the next version, writes the
-`CHANGELOG.md` entry, commits `chore(release): X.Y.Z [skip ci]`, tags, and
-creates the GitHub release. It needs no secrets — the built-in `GITHUB_TOKEN`
-is enough. Preview what it would do first with:
+**[`.github/workflows/release.yml`](.github/workflows/release.yml)** is run by
+hand from the Actions tab: it runs `check`, works out the next version from the
+commits, writes the `CHANGELOG.md` entry, commits `chore(release): X.Y.Z`,
+tags, and creates the GitHub release. It needs no secrets — the built-in
+`GITHUB_TOKEN` is enough. Preview what it would do first with:
 
 ```bash
 mise run release-preview
 ```
 
-**[`.github/workflows/publish.yml`](.github/workflows/publish.yml)** then runs
-as a dependent job, but only when a version was actually cut — a push of
-`docs:`/`chore:` commits releases nothing and publishes nothing. It is also a
-`workflow_dispatch` entry point, so you can re-submit by hand from the Actions
-tab. It needs two repository secrets:
+**[`.github/workflows/publish.yml`](.github/workflows/publish.yml)** is a
+separate manual workflow — releasing does not publish, and publishing does not
+release. Re-running it updates the existing `raycast/extensions` pull request
+rather than opening a second one. It needs two repository secrets:
 
 | Secret | Where it comes from |
 | --- | --- |
