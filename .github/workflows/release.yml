@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  MISE_TRUSTED_CONFIG_PATHS: ${{ github.workspace }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # semantic-release reads the full history to work out the next version,
+          # and authenticates with GITHUB_TOKEN rather than the checkout creds.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: jdx/mise-action@v2
+
+      - name: Release
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          before=$(node -p "require('./package.json').version")
+          mise run release
+          after=$(node -p "require('./package.json').version")
+          # Most pushes (docs:, chore:, refactor:) produce no release at all.
+          if [ "$before" = "$after" ]; then
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            echo "Released $after"
+          fi
+
+  publish:
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit

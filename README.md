@@ -155,10 +155,52 @@ as a dependency.
 | `mise run typecheck` | `tsc --noEmit` | Type sanity check. |
 | `mise run lint` / `mise run fix` | `ray lint` (`--fix`) | `@raycast/eslint-config` rules. |
 | `mise run check` | typecheck + lint + build | Everything before a publish. |
+| `mise run release-preview` | `semantic-release --dry-run` | Show the next version and notes, changing nothing. |
+| `mise run release` | `semantic-release` | Cut a release. Run by CI, not by hand. |
 | `mise run publish` | `npx @raycast/api publish` | Publish to the Raycast Store. |
 
 Publishing requires the `author` field in `package.json` to be a real Raycast
 username, otherwise validation fails with `Invalid author`.
+
+### Releasing (GitHub Actions)
+
+The Raycast Store ignores `package.json` `version` — it versions extensions by
+`CHANGELOG.md` entries and PR merge dates. The version and git tags here exist
+for this repository only.
+
+Releases are cut by [semantic-release](https://semantic-release.gitbook.io)
+from the conventional commit messages, so nothing is bumped by hand:
+
+| Commit prefix | Bump |
+| --- | --- |
+| `fix:`, `perf:` | patch |
+| `feat:` | minor |
+| any `BREAKING CHANGE:` footer | major |
+| `chore:`, `docs:`, `refactor:`, `test:`, `ci:` | none |
+
+**[`.github/workflows/release.yml`](.github/workflows/release.yml)** runs on
+every push to `main`: it runs `check`, works out the next version, writes the
+`CHANGELOG.md` entry, commits `chore(release): X.Y.Z [skip ci]`, tags, and
+creates the GitHub release. It needs no secrets — the built-in `GITHUB_TOKEN`
+is enough. Preview what it would do first with:
+
+```bash
+mise run release-preview
+```
+
+**[`.github/workflows/publish.yml`](.github/workflows/publish.yml)** then runs
+as a dependent job, but only when a version was actually cut — a push of
+`docs:`/`chore:` commits releases nothing and publishes nothing. It is also a
+`workflow_dispatch` entry point, so you can re-submit by hand from the Actions
+tab. It needs two repository secrets:
+
+| Secret | Where it comes from |
+| --- | --- |
+| `RAY_TOKEN` | `npx ray token` (after `npx ray login`) |
+| `RAYCAST_GITHUB_TOKEN` | a GitHub personal access token that can fork `raycast/extensions` |
+
+When submitting to the Store, replace the date of the entry you're shipping
+with the `{PR_MERGE_DATE}` placeholder, which Raycast fills in on merge.
 
 ## Commands
 
