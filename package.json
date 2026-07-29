@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "dev-project-launcher",
+  "name": "raycast-dev-project-launcher",
   "title": "Dev Project Launcher",
   "description": "Recursively scans your development directories, maps subfolders to project entities, and lets you jump straight into VS Code, WebStorm, or iTerm.",
   "icon": "extension-icon.png",

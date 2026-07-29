@@ -36,8 +36,9 @@ mapping per project type.
 
 ## Project Structure
 
-```
-dev-project-launcher/
+```text
+raycast-dev-project-launcher/
+├── mise.toml                    # Task runner (wraps the npm scripts)
 ├── package.json                 # Raycast extension manifest + preferences
 ├── tsconfig.json
 ├── raycast-env.d.ts              # Typed preference/argument declarations
@@ -61,7 +62,7 @@ dev-project-launcher/
 Configured from Raycast → Extensions → Dev Project Launcher → Preferences:
 
 | Preference | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Development Root Directory | directory | `~/Developer` | Root folder scanned recursively. Leave it empty and the extension auto-detects the first existing of `~/Developer`, `~/Development`, `~/Projects`, `~/Code`, `~/dev`. |
 | Additional Project Directories | text | *(empty)* | Comma-separated extra absolute paths, e.g. `~/Work,~/OpenSource`. |
 | Scan Depth | dropdown | `2` | How many levels deep to search below each root (1–6, 8, 10). |
@@ -120,8 +121,8 @@ running the dev server once. Raycast registers the extension while
 process** — there's no separate "install" step.
 
 ```bash
-git clone https://github.com/amine2233/raycast-dev-launcher.git
-cd raycast-dev-launcher
+git clone https://github.com/amine2233/raycast-dev-project-launcher.git
+cd raycast-dev-project-launcher
 mise run dev          # or: npm install && npm run dev
 ```
 
